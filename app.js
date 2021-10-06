@@ -3,19 +3,21 @@ const rollButton = document.querySelector('.roll-button');
 const resetButton = document.querySelector('.reset-button');
 let totalScore = document.querySelector('.total');
 const scoreBoard = document.querySelector('.score-board');
+const loseWinText = document.getElementById('lose-win-text');
+const player = document.getElementById('player');
 let total = 0;
 totalScore.innerHTML = 0;
-
+let currentPlayer = 1;
 
 let images = [];
 
- 
+
 function createImage(src, title) {
-  let img   = new Image();
-  img.src   = src;
-  img.alt   = title;
-  img.title = title;
-  return img; 
+    let img = new Image();
+    img.src = src;
+    img.alt = title;
+    img.title = title;
+    return img;
 };
 
 
@@ -30,35 +32,59 @@ images.push(createImage('http://www.clker.com/cliparts/l/6/4/3/K/H/dice-6-md.png
 
 diceDiv.appendChild(images[0]);
 
+function rollDice() {
+    return Math.floor((Math.random() * 6) + 1)
+}
+
+function rollAnimation() {
+    diceDiv.style.animation = "dice-images 0.25s linear"
+    setTimeout(() => {
+        diceDiv.style.removeProperty('animation')
+    }, 250)
+}
+
+function printImage(score) {
+    diceDiv.innerHTML = '';
+    diceDiv.appendChild(images[score]);
+}
+
+function checkWinOrLoss(score) {
+    if (score === 1) {
+        loseWinText.innerHTML = 'You Lose!';
+        rollButton.style.visibility = "hidden";
+    } else if (total >= 20) {
+        loseWinText.innerHTML = 'You Win!';
+        rollButton.style.visibility = "hidden";
+    }
+}
+
+function changePlayer() {
+    if (currentPlayer == 1) {
+        currentPlayer = 2;
+    } else {
+        currentPlayer = 1
+    }
+    player.innerHTML = `Player ${currentPlayer}`
+}
 
 rollButton.addEventListener('click', () => {
-    diceDiv.style.animation = "dice-images 0.25s linear"
-        setTimeout(() => {
-            diceDiv.style.removeProperty('animation')
-        }, 250)
-
-  let score = Math.floor((Math.random() * 6) + 1);
-  function printImage() {
-	  diceDiv.innerHTML = ''; // this is a no-no
-		diceDiv.appendChild(images[score]);
-	}
-  
-  if (score > 0 && score < 7) {
-    printImage();
-  } 
-
-  let ul = document.createElement('ul');
-  let li = document.createElement('li');
-   
-  total = score + total;
-  totalScore.innerHTML = total;
+    rollAnimation()
+    let score = rollDice();
+    printImage(score);
+    total = score + total;
+    totalScore.innerHTML = total;
+    checkWinOrLoss(score);
 });
 
 
+
 resetButton.addEventListener('click', () => {
-  total = 0;
-  totalScore.innerHTML = '0';
-  diceDiv.innerHTML = ''; 
-  diceDiv.appendChild(images[0]);
-  scoreBoard.innerHTML = ''; 
+    changePlayer();
+    loseWinText.innerHTML = '';
+    rollButton.style.visibility = "visible";
+    total = 0;
+    totalScore.innerHTML = '0';
+    diceDiv.innerHTML = '';
+    diceDiv.appendChild(images[0]);
+    scoreBoard.innerHTML = '';
 });
